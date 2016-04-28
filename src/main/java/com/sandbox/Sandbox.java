@@ -9,7 +9,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 public class Sandbox {
     public static void main(final String[] arguments) throws Exception {
-        final Server server = new Server(8080);
+        final Server server = new Server(8081);
 
         final ContextHandler context = new ContextHandler();
         context.setContextPath("/");
