@@ -1,6 +1,6 @@
 from subprocess import Popen, PIPE
 import re
-
+import os
 
 def split(label):
     regex=re.compile("(.*)(\d+)")
@@ -74,6 +74,10 @@ def main():
             branch = p.match(line).group(1)
             print "branch is %s" % branch
     next_version=get_next_version(branch)
+    try:
+        os.remove("version.txt")
+    except OSError:
+        pass
     if next_version is not None:
         f = open('version.txt', 'w')
         f.write(next_version)
