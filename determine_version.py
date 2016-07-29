@@ -1,15 +1,14 @@
 from subprocess import Popen, PIPE
 import re
 
-DELIMITERS=["."]
 
-def split(tag):
-    regex=re.compile("(^.*[%s]{0,1})(\d+)"% ''.join(DELIMITERS))
+def split(tag, prefix):
+    regex=re.compile("(%s)(\d+)"% prefix)
     assert regex.match(tag)
     return regex.match(tag).group(1), int(regex.match(tag).group(2))
 
-def next(tag):
-    prefix, number=split(tag)
+def next(tag, prefix):
+    prefix, number=split(tag, prefix)
     return prefix+str(number+1)
 
 # the prefix includes the separator
@@ -22,7 +21,7 @@ def get_last_tag(prefix):
         print line
         if p.match(line):
             tag=p.match(line).group(1)
-            if split(tag)[1]>split(last)[1]:
+            if split(tag, prefix)[1]>split(last, prefix)[1]:
                 last=tag
     return last
 
@@ -33,13 +32,16 @@ feature_branch_regex=re.compile("^.*feature/.*-(\d+)$")
 def get_next_version(branch):
     result=":-)"
     if "develop"==branch:
-        return next(get_last_tag("0.0."))
+        prefix="0.0."
+        return next(get_last_tag(prefix), prefix)
     elif release_branch_regex.match(branch):
         first_part=release_branch_regex.match(branch).group(1)
-        return next(get_last_tag(first_part+"."))
+        prefix=first_part+"."
+        return next(get_last_tag(prefix), prefix)
     elif feature_branch_regex.match(branch):
         feature_number=feature_branch_regex.match(branch).group(1)
-        return next(get_last_tag("0."+feature_number+"."))
+        prefix =  "0.%s."%feature_number
+        return next(get_last_tag(prefix), prefix)
     else:
         return None
 
