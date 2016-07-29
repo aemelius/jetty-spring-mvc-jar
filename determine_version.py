@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE
 import re
 
-DELIMITERS=["-", "."]
+DELIMITERS=["."]
 
 def split(tag):
     regex=re.compile("(^.*[%s]{0,1})(\d+)"% ''.join(DELIMITERS))
@@ -27,26 +27,12 @@ def get_last_tag(prefix):
     return last
 
 
-#assert get_last_tag("v1.0.")=="v1.0.0"
-#last_tag=get_last_tag("8.0.8.")
-#assert last_tag=="8.0.8.0", "last tag is not %s !" % "8.0.8.0" 
-
-
-#assert next(get_last_tag("8.0.8."))=="8.0.8.1"
-#assert next(get_last_tag("8.0."))=="8.0.9"
-
-assert next("abcd-1234")=="abcd-1235"
-assert next("abcd.1")=="abcd.2"
-assert next("abcd-12")=="abcd-13"
-assert next("abcd-0")=="abcd-1"
-
 release_branch_regex=re.compile("^.*release/(\d+\.\d+)$")
 feature_branch_regex=re.compile("^.*feature/.*-(\d+)$")
 
 def get_next_version(branch):
     result=":-)"
     if "develop"==branch:
-        #prefix, previous_sprint=splitdd(get_last_tag("END_OF_SPRINT-"))
         return next(get_last_tag("0.0."))
     elif release_branch_regex.match(branch):
         first_part=release_branch_regex.match(branch).group(1)
