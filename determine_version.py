@@ -25,6 +25,24 @@ def get_last_tag(prefix):
                 last=tag
     return last
 
+def get_develop_prefix():
+    p = Popen(['git', 'ls-remote', 'origin'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    last_major=0
+    last_minor=0
+    output, err = p.communicate()
+    p=re.compile("^.*refs/heads/release/(\d+)\.(\d+)$")
+    for line in [s.strip() for s in output.splitlines()]:
+        print line
+        if p.match(line):
+            major=p.match(line).group(1)
+            minor=p.match(line).group(2)
+
+            if major>=last_major:
+                last_major=major
+                if minor>last_minor:
+                    last_minor=minor
+                    
+    return "%s.%s"% (last_major, last_minor)
 
 release_branch_regex=re.compile("^.*release/(\d+\.\d+)$")
 feature_branch_regex=re.compile("^.*feature/.*-(\d+)$")
@@ -32,7 +50,8 @@ feature_branch_regex=re.compile("^.*feature/.*-(\d+)$")
 def get_next_version(branch):
     result=":-)"
     if "develop"==branch:
-        prefix="0.0."
+        prefix=get_develop_prefix()+"."
+        print prefix
         return next(get_last_tag(prefix))
     elif release_branch_regex.match(branch):
         first_part=release_branch_regex.match(branch).group(1)
