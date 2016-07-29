@@ -18,7 +18,6 @@ def get_last_tag(prefix):
     output, err = p.communicate()
     p=re.compile("^.*refs/tags/(%s\d+)$"%prefix)
     for line in [s.strip() for s in output.splitlines()]:
-        print line
         if p.match(line):
             tag=p.match(line).group(1)
             if split(tag)[1]>split(last)[1]:
@@ -32,7 +31,6 @@ def get_develop_prefix():
     output, err = p.communicate()
     p=re.compile("^.*refs/heads/release/(\d+)\.(\d+)$")
     for line in [s.strip() for s in output.splitlines()]:
-        print line
         if p.match(line):
             major=p.match(line).group(1)
             minor=p.match(line).group(2)
@@ -51,7 +49,6 @@ def get_next_version(branch):
     result=":-)"
     if "develop"==branch:
         prefix=get_develop_prefix()+"."
-        print prefix
         return next(get_last_tag(prefix))
     elif release_branch_regex.match(branch):
         first_part=release_branch_regex.match(branch).group(1)
@@ -76,6 +73,10 @@ def main():
         if p.match(line):
             branch = p.match(line).group(1)
             print "branch is %s" % branch
+    next_version=get_next_version(branch)
+    if next_version is not None:
+        f = open('version.txt', 'w')
+        f.write(next_version)
     print "next version should be %s" % get_next_version(branch)
 
 
