@@ -1,8 +1,10 @@
 from subprocess import Popen, PIPE
 import re
 
+DELIMITERS=["-", "."]
+
 def split(tag):
-    regex=re.compile("(^.*[-.])(\d+)")
+    regex=re.compile("(^.*[%s]{0,1})(\d+)"% ''.join(DELIMITERS))
     assert regex.match(tag)
     return regex.match(tag).group(1), int(regex.match(tag).group(2))
 
@@ -45,13 +47,13 @@ def get_next_version(branch):
     result=":-)"
     if "develop"==branch:
         #prefix, previous_sprint=splitdd(get_last_tag("END_OF_SPRINT-"))
-        return next(get_last_tag("d."))
+        return next(get_last_tag("0.0."))
     elif release_branch_regex.match(branch):
         first_part=release_branch_regex.match(branch).group(1)
-        return next(get_last_tag("r"+first_part+"."))
+        return next(get_last_tag(first_part+"."))
     elif feature_branch_regex.match(branch):
-        first_part=feature_branch_regex.match(branch).group(1)
-        return next(get_last_tag("f"+first_part+"."))
+        feature_number=feature_branch_regex.match(branch).group(1)
+        return next(get_last_tag("0."+feature_number+"."))
     else:
         return None
 
